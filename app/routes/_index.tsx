@@ -1,177 +1,88 @@
-import {Await, useLoaderData, Link} from 'react-router';
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense} from 'react';
-import {Image} from '@shopify/hydrogen';
-import type {
-  FeaturedCollectionFragment,
-  RecommendedProductsQuery,
-} from 'storefrontapi.generated';
-import {ProductItem} from '~/components/ProductItem';
-import {MockShopNotice} from '~/components/MockShopNotice';
+import {
+  PRODUCT_LANDING_QUERY,
+  INGREDIENTS_QUERY,
+  TESTIMONIAL_VIDEOS_QUERY,
+  mapProductLanding,
+  pickVideoSource,
+  type ProductLandingQueryData,
+  type IngredientsQueryData,
+  type TestimonialVideosQueryData,
+  type TithyIngredient,
+} from '~/lib/tithy-queries';
+import {richTextToPlainText} from '~/lib/richText';
+import {ProductGallery} from '~/components/tithy/ProductGallery';
+import {ProductInfo} from '~/components/tithy/ProductInfo';
+import {ProductStory} from '~/components/tithy/ProductStory';
+import {Ingredients} from '~/components/tithy/Ingredients';
+import {HowToUse} from '~/components/tithy/HowToUse';
+import {TestimonialVideo} from '~/components/tithy/TestimonialVideo';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Hydrogen | Home'}];
+export const meta: Route.MetaFunction = ({data}) => {
+  const product = data?.product;
+  return [
+    {title: product ? `${product.title} | Tithyco` : 'Tithyco'},
+    {
+      name: 'description',
+      content: product?.shortDescription ?? 'Premium product landing page',
+    },
+  ];
 };
 
-export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+export async function loader({context}: Route.LoaderArgs) {
+  const {storefront, env} = context;
+  const handle = env.PUBLIC_HOME_PRODUCT_HANDLE;
 
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
-  return {...deferredData, ...criticalData};
-}
-
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
-async function loadCriticalData({context}: Route.LoaderArgs) {
-  const [{collections}] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTION_QUERY),
-    // Add other queries here, so that they are loaded in parallel
+  const [productData, ingredientsData, testimonialsData] = await Promise.all([
+    storefront.query<ProductLandingQueryData>(PRODUCT_LANDING_QUERY, {
+      variables: {handle},
+    }),
+    storefront.query<IngredientsQueryData>(INGREDIENTS_QUERY),
+    storefront.query<TestimonialVideosQueryData>(TESTIMONIAL_VIDEOS_QUERY),
   ]);
 
-  return {
-    isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
-    featuredCollection: collections.nodes[0],
-  };
-}
+  const product = mapProductLanding(productData);
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({context}: Route.LoaderArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
-    .catch((error: Error) => {
-      // Log query errors, but don't throw them so the page can still render
-      console.error(error);
-      return null;
-    });
+  const ingredients: TithyIngredient[] = ingredientsData.metaobjects.nodes.map(
+    (n) => ({
+      heading: n.heading?.value ?? '',
+      text: richTextToPlainText(n.text?.value),
+      icon: n.icon?.value ?? '',
+    }),
+  );
 
-  return {
-    recommendedProducts,
-  };
+  const testimonialVideos = testimonialsData.metaobjects.nodes
+    .map((n) => pickVideoSource(n.video?.reference?.sources ?? []))
+    .filter((url): url is string => url !== null);
+
+  return {product, ingredients, testimonialVideos};
 }
 
 export default function Homepage() {
-  const data = useLoaderData<typeof loader>();
+  const {product, ingredients, testimonialVideos} =
+    useLoaderData<typeof loader>();
+
+  if (!product) {
+    return (
+      <div className="p-8">Product not found — check the product handle.</div>
+    );
+  }
+
   return (
-    <div className="home">
-      {data.isShopLinked ? null : <MockShopNotice />}
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+    // Cancels the `body > main { margin: 0 1rem 1rem 1rem }` stock reset so
+    // this fully custom, Tailwind-driven page can go truly edge-to-edge.
+    <div className="-mx-4 -mb-4">
+      <section className="pt-4 pb-4 md:pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 max-w-6xl mx-auto px-3 md:px-4">
+          <ProductGallery images={product.images} />
+          <ProductInfo product={product} />
+        </div>
+      </section>
+      <TestimonialVideo videos={testimonialVideos} />
+      <Ingredients items={ingredients} />
+      <ProductStory />
+      <HowToUse />
     </div>
   );
 }
-
-function FeaturedCollection({
-  collection,
-}: {
-  collection: FeaturedCollectionFragment;
-}) {
-  if (!collection) return null;
-  const image = collection?.image;
-  return (
-    <Link
-      className="featured-collection"
-      to={`/collections/${collection.handle}`}
-    >
-      {image && (
-        <div className="featured-collection-image">
-          <Image
-            data={image}
-            sizes="100vw"
-            alt={image.altText || collection.title}
-          />
-        </div>
-      )}
-      <h1>{collection.title}</h1>
-    </Link>
-  );
-}
-
-function RecommendedProducts({
-  products,
-}: {
-  products: Promise<RecommendedProductsQuery | null>;
-}) {
-  return (
-    <section
-      className="recommended-products"
-      aria-labelledby="recommended-products"
-    >
-      <h2 id="recommended-products">Recommended Products</h2>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={products}>
-          {(response) => (
-            <div className="recommended-products-grid">
-              {response
-                ? response.products.nodes.map((product) => (
-                    <ProductItem key={product.id} product={product} />
-                  ))
-                : null}
-            </div>
-          )}
-        </Await>
-      </Suspense>
-      <br />
-    </section>
-  );
-}
-
-const FEATURED_COLLECTION_QUERY = `#graphql
-  fragment FeaturedCollection on Collection {
-    id
-    title
-    image {
-      id
-      url
-      altText
-      width
-      height
-    }
-    handle
-  }
-  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...FeaturedCollection
-      }
-    }
-  }
-` as const;
-
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
-    id
-    title
-    handle
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    featuredImage {
-      id
-      url
-      altText
-      width
-      height
-    }
-  }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...RecommendedProduct
-      }
-    }
-  }
-` as const;

@@ -36,6 +36,12 @@ export function Aside({
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
   const id = useId();
+
+  // Skip the slide/fade transition on the very first paint so a slow-loading
+  // stylesheet can't make the closed aside flash open before snapping shut.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -56,20 +62,33 @@ export function Aside({
   return (
     <div
       aria-modal
-      className={`overlay ${expanded ? 'expanded' : ''}`}
+      className={`fixed inset-0 z-50 ${expanded ? 'pointer-events-auto' : 'pointer-events-none'}`}
       role="dialog"
       aria-labelledby={id}
     >
-      <button className="close-outside" onClick={close} />
-      <aside>
-        <header>
-          <h3 id={id}>{heading}</h3>
-          <button className="close reset" onClick={close} aria-label="Close">
+      <button
+        className={`absolute inset-0 bg-black/40 ${mounted ? 'transition-opacity' : ''} ${expanded ? 'opacity-100' : 'opacity-0'}`}
+        onClick={close}
+      />
+      <div
+        className={`absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl flex flex-col ${mounted ? 'transition-transform' : ''} ${
+          expanded ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex justify-between items-center px-4 py-4 border-b shrink-0">
+          <h3 id={id} className="font-semibold text-lg tracking-wide">
+            {heading}
+          </h3>
+          <button
+            className="text-xl cursor-pointer"
+            onClick={close}
+            aria-label="Close"
+          >
             &times;
           </button>
-        </header>
-        <main>{children}</main>
-      </aside>
+        </div>
+        <div className="flex-1 min-h-0 flex flex-col">{children}</div>
+      </div>
     </div>
   );
 }

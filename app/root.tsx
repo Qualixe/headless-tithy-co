@@ -12,9 +12,15 @@ import {
 } from 'react-router';
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
-import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
-import resetStyles from '~/styles/reset.css?url';
-import appStyles from '~/styles/app.css?url';
+import {HEADER_QUERY} from '~/lib/fragments';
+import {
+  SHOP_POLICIES_QUERY,
+  mapShopPolicies,
+  type ShopPoliciesQueryData,
+  LOGO_QUERY,
+  mapLogoUrl,
+  type LogoQueryData,
+} from '~/lib/tithy-queries';
 import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
 
@@ -101,17 +107,20 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context}: Route.LoaderArgs) {
   const {storefront} = context;
 
-  const [header] = await Promise.all([
+  const [header, logoData] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
         headerMenuHandle: 'main-menu', // Adjust to your header menu handle
       },
     }),
+    storefront.query<LogoQueryData>(LOGO_QUERY, {
+      cache: storefront.CacheLong(),
+    }),
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {header};
+  return {header, logoUrl: mapLogoUrl(logoData)};
 }
 
 /**
@@ -122,23 +131,20 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
 function loadDeferredData({context}: Route.LoaderArgs) {
   const {storefront, customerAccount, cart} = context;
 
-  // defer the footer query (below the fold)
-  const footer = storefront
-    .query(FOOTER_QUERY, {
-      cache: storefront.CacheLong(),
-      variables: {
-        footerMenuHandle: 'footer', // Adjust to your footer menu handle
-      },
-    })
+  // the stock skeleton's "footer" nav menu isn't configured for this shop,
+  // so policy links are sourced directly from the shop's policy fields
+  const policies = storefront
+    .query<ShopPoliciesQueryData>(SHOP_POLICIES_QUERY)
+    .then(mapShopPolicies)
     .catch((error: Error) => {
-      // Log query errors, but don't throw them so the page can still render
       console.error(error);
-      return null;
+      return [];
     });
+
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
-    footer,
+    policies,
   };
 }
 
@@ -151,8 +157,6 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={tailwindCss}></link>
-        <link rel="stylesheet" href={resetStyles}></link>
-        <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
       </head>

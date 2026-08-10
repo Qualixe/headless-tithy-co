@@ -1,5 +1,6 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
 import {Link} from 'react-router';
+import {ShoppingCart} from 'lucide-react';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
@@ -42,25 +43,20 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
-  const withDiscount =
-    cart &&
-    Boolean(cart?.discountCodes?.filter((code) => code.applicable)?.length);
-  const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
 
   return (
     <section
-      className={className}
+      className="flex flex-col flex-1 min-h-0"
       aria-label={layout === 'page' ? 'Cart page' : 'Cart drawer'}
     >
-      <CartEmpty hidden={linesCount} layout={layout} />
-      <div className="cart-details">
-        <p id="cart-lines" className="sr-only">
-          Line items
-        </p>
-        <div>
-          <ul aria-labelledby="cart-lines">
+      {linesCount ? (
+        <div className="flex-1 min-h-0 flex flex-col">
+          <p id="cart-lines" className="sr-only">
+            Line items
+          </p>
+          <ul aria-labelledby="cart-lines" className="flex-1 overflow-y-auto">
             {(cart?.lines?.nodes ?? []).map((line) => {
               // we do not render non-parent lines at the root of the cart
               if (
@@ -79,30 +75,33 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
               );
             })}
           </ul>
+          {cartHasItems && <CartSummary cart={cart} layout={layout} />}
         </div>
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
-      </div>
+      ) : (
+        <CartEmpty />
+      )}
     </section>
   );
 }
 
-function CartEmpty({
-  hidden = false,
-}: {
-  hidden: boolean;
-  layout?: CartMainProps['layout'];
-}) {
+function CartEmpty() {
   const {close} = useAside();
   return (
-    <div hidden={hidden}>
-      <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
+    <div className="flex flex-col items-center text-center h-full py-16 px-4">
+      <div className="w-14 h-14 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center mb-4">
+        <ShoppingCart className="w-6 h-6" />
+      </div>
+      <h3 className="font-semibold text-lg">Your cart is empty</h3>
+      <p className="text-sm text-gray-500 mt-1 max-w-xs">
+        Looks like you haven&rsquo;t added anything to your cart yet.
       </p>
-      <br />
-      <Link to="/collections" onClick={close} prefetch="viewport">
-        Continue shopping →
+      <Link
+        to="/collections"
+        onClick={close}
+        prefetch="viewport"
+        className="mt-6 bg-black text-white! rounded-lg px-6 py-3 font-medium cursor-pointer"
+      >
+        Continue Shopping
       </Link>
     </div>
   );

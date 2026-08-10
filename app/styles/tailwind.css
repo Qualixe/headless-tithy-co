@@ -4,3 +4,21 @@
  */
 
 @import 'tailwindcss';
+
+/* Loaded into Tailwind's `base` layer (rather than as separate, unlayered
+   <link> stylesheets) so that Tailwind's utility classes always win over
+   them, regardless of selector specificity or source order. Plain unlayered
+   CSS always beats layered CSS in the cascade — these stock stylesheets use
+   bare tag selectors (e.g. `h1 { font-size: 1.6rem }`, `ul { padding: 0 }`,
+   `a { color: #000 }`) that were silently overriding Tailwind classes like
+   `text-3xl` or `px-4` when loaded as separate stylesheets. */
+@import './reset.css' layer(base);
+@import './app.css' layer(base);
+
+@import './tithy-theme.css';
+
+/* Loaded here (render-blocking, via root.tsx's <link>) instead of as
+   component-level `import 'swiper/css'` statements, which Vite injects via
+   JS after hydration and causes unstyled slides to flash on page load. */
+@import 'swiper/css';
+@import 'swiper/css/thumbs';

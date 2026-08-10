@@ -1,129 +1,78 @@
 import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
-import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import {Await} from 'react-router';
+import {Image} from '@shopify/hydrogen';
+import type {HeaderQuery} from 'storefrontapi.generated';
+import type {ShopPolicyLink} from '~/lib/tithy-queries';
 
 interface FooterProps {
-  footer: Promise<FooterQuery | null>;
   header: HeaderQuery;
   publicStoreDomain: string;
+  policies: Promise<ShopPolicyLink[]>;
+  logoUrl: string | null;
 }
 
-export function Footer({
-  footer: footerPromise,
-  header,
-  publicStoreDomain,
-}: FooterProps) {
+export function Footer({header, policies, logoUrl}: FooterProps) {
+  const {shop} = header;
+  const year = new Date().getFullYear();
+
   return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {(footer) => (
-          <footer className="footer">
-            {footer?.menu && header.shop.primaryDomain?.url && (
-              <FooterMenu
-                menu={footer.menu}
-                primaryDomainUrl={header.shop.primaryDomain.url}
-                publicStoreDomain={publicStoreDomain}
+    <footer className="border-t mb-16">
+      <div className="max-w-6xl mx-auto px-4 py-6 text-[13px] text-gray-500">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="shrink-0">
+            {logoUrl ? (
+              <Image
+                src={logoUrl}
+                alt={shop.name}
+                aspectRatio="1841/441"
+                width={117}
+                height={28}
+                className="h-7 w-auto object-contain"
               />
+            ) : (
+              <span className="font-semibold text-black">{shop.name}</span>
             )}
-          </footer>
-        )}
-      </Await>
-    </Suspense>
+          </div>
+
+          <p className="whitespace-nowrap text-center text-[13px]">
+            © {year} {shop.name}. All rights reserved. Created by{' '}
+            <a
+              href="https://qualixe.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Qualixe
+            </a>
+          </p>
+
+          <Suspense fallback={null}>
+            <Await resolve={policies}>
+              {(links) => <FooterPolicyLinks links={links} />}
+            </Await>
+          </Suspense>
+        </div>
+      </div>
+    </footer>
   );
 }
 
-function FooterMenu({
-  menu,
-  primaryDomainUrl,
-  publicStoreDomain,
-}: {
-  menu: FooterQuery['menu'];
-  primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
-  publicStoreDomain: string;
-}) {
+function FooterPolicyLinks({links}: {links: ShopPolicyLink[]}) {
+  if (links.length === 0) return <div className="shrink-0" />;
+
   return (
-    <nav className="footer-menu" role="navigation">
-      {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a href={url} key={item.id} rel="noopener noreferrer" target="_blank">
-            {item.title}
-          </a>
-        ) : (
-          <NavLink
-            end
-            key={item.id}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
+    <div className="flex flex-wrap justify-center gap-3 shrink-0">
+      {links.map((link) => (
+        <a
+          key={link.url}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[13px] whitespace-nowrap"
+        >
+          {link.title}
+        </a>
+      ))}
+    </div>
   );
-}
-
-const FALLBACK_FOOTER_MENU = {
-  id: 'gid://shopify/Menu/199655620664',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461633060920',
-      resourceId: 'gid://shopify/ShopPolicy/23358046264',
-      tags: [],
-      title: 'Privacy Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/privacy-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633093688',
-      resourceId: 'gid://shopify/ShopPolicy/23358013496',
-      tags: [],
-      title: 'Refund Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/refund-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633126456',
-      resourceId: 'gid://shopify/ShopPolicy/23358111800',
-      tags: [],
-      title: 'Shipping Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/shipping-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633159224',
-      resourceId: 'gid://shopify/ShopPolicy/23358079032',
-      tags: [],
-      title: 'Terms of Service',
-      type: 'SHOP_POLICY',
-      url: '/policies/terms-of-service',
-      items: [],
-    },
-  ],
-};
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'white',
-  };
 }

@@ -19,6 +19,10 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    // Shopify-hosted testimonial videos (Video metaobject field) are served
+    // from the shop's primary domain, not cdn.shopify.com, and `media-src`
+    // otherwise falls back to `default-src`, which doesn't include it.
+    mediaSrc: ["'self'", 'https://cdn.shopify.com', 'https://www.tithyco.com'],
   });
 
   const body = await renderToReadableStream(

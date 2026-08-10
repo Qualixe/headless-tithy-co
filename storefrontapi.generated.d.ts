@@ -377,69 +377,120 @@ export type FooterQuery = {
   >;
 };
 
-export type FeaturedCollectionFragment = Pick<
-  StorefrontAPI.Collection,
-  'id' | 'title' | 'handle'
-> & {
-  image?: StorefrontAPI.Maybe<
-    Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
-  >;
-};
-
-export type FeaturedCollectionQueryVariables = StorefrontAPI.Exact<{
+export type ProductLandingQueryVariables = StorefrontAPI.Exact<{
+  handle: StorefrontAPI.Scalars['String']['input'];
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
-export type FeaturedCollectionQuery = {
-  collections: {
-    nodes: Array<
-      Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
-        image?: StorefrontAPI.Maybe<
-          Pick<
-            StorefrontAPI.Image,
-            'id' | 'url' | 'altText' | 'width' | 'height'
-          >
+export type ProductLandingQuery = {
+  product?: StorefrontAPI.Maybe<
+    Pick<
+      StorefrontAPI.Product,
+      'id' | 'handle' | 'title' | 'description' | 'descriptionHtml'
+    > & {
+      images: {
+        nodes: Array<
+          Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
         >;
-      }
+      };
+      variants: {
+        nodes: Array<
+          Pick<
+            StorefrontAPI.ProductVariant,
+            'id' | 'title' | 'availableForSale'
+          > & {
+            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+            compareAtPrice?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+            >;
+            selectedOptions: Array<
+              Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+            >;
+          }
+        >;
+      };
+    }
+  >;
+  productSubtitle?: StorefrontAPI.Maybe<{
+    subtitle?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.MetaobjectField, 'value'>
     >;
-  };
+    shortDescription?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.MetaobjectField, 'value'>
+    >;
+    logo?: StorefrontAPI.Maybe<{
+      reference?: StorefrontAPI.Maybe<{
+        image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+      }>;
+    }>;
+  }>;
 };
 
-export type RecommendedProductFragment = Pick<
-  StorefrontAPI.Product,
-  'id' | 'title' | 'handle'
-> & {
-  priceRange: {
-    minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
-  };
-  featuredImage?: StorefrontAPI.Maybe<
-    Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
-  >;
-};
-
-export type RecommendedProductsQueryVariables = StorefrontAPI.Exact<{
-  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
-  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+export type IngredientsQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
 }>;
 
-export type RecommendedProductsQuery = {
-  products: {
-    nodes: Array<
-      Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
-        priceRange: {
-          minVariantPrice: Pick<
-            StorefrontAPI.MoneyV2,
-            'amount' | 'currencyCode'
-          >;
-        };
-        featuredImage?: StorefrontAPI.Maybe<
-          Pick<
-            StorefrontAPI.Image,
-            'id' | 'url' | 'altText' | 'width' | 'height'
-          >
-        >;
-      }
+export type IngredientsQuery = {
+  metaobjects: {
+    nodes: Array<{
+      heading?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      text?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+      icon?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+    }>;
+  };
+};
+
+export type TestimonialVideosQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type TestimonialVideosQuery = {
+  metaobjects: {
+    nodes: Array<{
+      video?: StorefrontAPI.Maybe<{
+        reference?: StorefrontAPI.Maybe<{
+          sources: Array<Pick<StorefrontAPI.VideoSource, 'url' | 'mimeType'>>;
+        }>;
+      }>;
+    }>;
+  };
+};
+
+export type LogoQueryVariables = StorefrontAPI.Exact<{[key: string]: never}>;
+
+export type LogoQuery = {
+  metaobject?: StorefrontAPI.Maybe<{
+    logo?: StorefrontAPI.Maybe<{
+      reference?: StorefrontAPI.Maybe<{
+        image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+      }>;
+    }>;
+  }>;
+};
+
+export type ShopPoliciesQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type ShopPoliciesQuery = {
+  shop: {
+    privacyPolicy?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.ShopPolicy, 'title' | 'url'>
+    >;
+    refundPolicy?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.ShopPolicy, 'title' | 'url'>
+    >;
+    termsOfService?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.ShopPolicy, 'title' | 'url'>
+    >;
+    shippingPolicy?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.ShopPolicy, 'title' | 'url'>
+    >;
+    subscriptionPolicy?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.ShopPolicyWithDefault, 'title' | 'url'>
     >;
   };
 };
@@ -1276,13 +1327,25 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  fragment FeaturedCollection on Collection {\n    id\n    title\n    image {\n      id\n      url\n      altText\n      width\n      height\n    }\n    handle\n  }\n  query FeaturedCollection($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...FeaturedCollection\n      }\n    }\n  }\n': {
-    return: FeaturedCollectionQuery;
-    variables: FeaturedCollectionQueryVariables;
+  '#graphql\n  query ProductLanding($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      handle\n      title\n      description\n      descriptionHtml\n      images(first: 10) {\n        nodes {\n          url\n          altText\n          width\n          height\n        }\n      }\n      variants(first: 25) {\n        nodes {\n          id\n          title\n          availableForSale\n          price {\n            amount\n            currencyCode\n          }\n          compareAtPrice {\n            amount\n            currencyCode\n          }\n          selectedOptions {\n            name\n            value\n          }\n        }\n      }\n    }\n    productSubtitle: metaobject(\n      handle: {handle: "hydrocolloid-bandage", type: "hydrocolloid_bandage"}\n    ) {\n      subtitle: field(key: "subtitle") {\n        value\n      }\n      shortDescription: field(key: "short_description") {\n        value\n      }\n      logo: field(key: "logo") {\n        reference {\n          ... on MediaImage {\n            image {\n              url\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: ProductLandingQuery;
+    variables: ProductLandingQueryVariables;
   };
-  '#graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 4, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n': {
-    return: RecommendedProductsQuery;
-    variables: RecommendedProductsQueryVariables;
+  '#graphql\n  query Ingredients {\n    metaobjects(type: "ingredients", first: 20) {\n      nodes {\n        heading: field(key: "heading") {\n          value\n        }\n        text: field(key: "text") {\n          value\n        }\n        icon: field(key: "icon") {\n          value\n        }\n      }\n    }\n  }\n': {
+    return: IngredientsQuery;
+    variables: IngredientsQueryVariables;
+  };
+  '#graphql\n  query TestimonialVideos {\n    metaobjects(type: "customers_say", first: 20) {\n      nodes {\n        video: field(key: "video") {\n          reference {\n            ... on Video {\n              sources {\n                url\n                mimeType\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: TestimonialVideosQuery;
+    variables: TestimonialVideosQueryVariables;
+  };
+  '#graphql\n  query Logo {\n    metaobject(handle: {handle: "hydrocolloid-bandage", type: "hydrocolloid_bandage"}) {\n      logo: field(key: "logo") {\n        reference {\n          ... on MediaImage {\n            image {\n              url\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: LogoQuery;
+    variables: LogoQueryVariables;
+  };
+  '#graphql\n  query ShopPolicies {\n    shop {\n      privacyPolicy {\n        title\n        url\n      }\n      refundPolicy {\n        title\n        url\n      }\n      termsOfService {\n        title\n        url\n      }\n      shippingPolicy {\n        title\n        url\n      }\n      subscriptionPolicy {\n        title\n        url\n      }\n    }\n  }\n': {
+    return: ShopPoliciesQuery;
+    variables: ShopPoliciesQueryVariables;
   };
   '#graphql\n  query Article(\n    $articleHandle: String!\n    $blogHandle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    blog(handle: $blogHandle) {\n      handle\n      articleByHandle(handle: $articleHandle) {\n        handle\n        title\n        contentHtml\n        publishedAt\n        author: authorV2 {\n          name\n        }\n        image {\n          id\n          altText\n          url\n          width\n          height\n        }\n        seo {\n          description\n          title\n        }\n      }\n    }\n  }\n': {
     return: ArticleQuery;
