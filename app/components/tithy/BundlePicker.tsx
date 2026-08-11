@@ -49,7 +49,7 @@ export function BundlePicker({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-3">Select Bundle</h2>
+      <h2 className="text-lg font-medium mb-3">Select Bundle</h2>
       <div className="grid grid-cols-3 gap-1 md:gap-2">
         {BUNDLES.map((bundle) => {
           const total = unitAmount * bundle.qty;
@@ -87,9 +87,9 @@ export function BundlePicker({
                 />
               </div>
 
-              <div className="font-semibold mt-2 text-md ">{bundle.label}</div>
+              <div className="font-medium mt-2 text-md ">{bundle.label}</div>
               <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
-                <span className="font-semibold text-sm">
+                <span className="font-medium text-sm">
                   {formatMoney({
                     amount: discounted.toFixed(2),
                     currencyCode: unitPrice.currencyCode,

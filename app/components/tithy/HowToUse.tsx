@@ -35,7 +35,7 @@ export function HowToUse() {
     <section id="how-to-use" className="scroll-mt-16 bg-gray-50 py-4 md:py-16">
       <div className="max-w-6xl mx-auto px-3">
         <div className="text-center">
-          <h2 className="text-xl md:text-3xl font-semibold mb-1">{HEADING}</h2>
+          <h2 className="text-xl md:text-3xl font-medium mb-1">{HEADING}</h2>
           <p className="text-gray-500 mb-8">{SUBHEADING}</p>
         </div>
 

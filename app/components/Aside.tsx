@@ -92,7 +92,7 @@ export function Aside({
         }`}
       >
         <div className="flex justify-between items-center px-4 py-4 border-b shrink-0">
-          <h3 id={id} className="font-semibold text-lg tracking-wide">
+          <h3 id={id} className="font-medium text-lg tracking-wide">
             {heading}
           </h3>
           <button

@@ -30,7 +30,7 @@ export function Footer({header, policies, logoUrl}: FooterProps) {
                 className="h-7 w-auto object-contain"
               />
             ) : (
-              <span className="font-semibold text-black">{shop.name}</span>
+              <span className="font-medium text-black">{shop.name}</span>
             )}
           </div>
 

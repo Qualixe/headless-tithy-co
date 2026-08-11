@@ -40,7 +40,7 @@ export function ProductStory() {
         </div>
 
         <div>
-          <h2 className="text-3xl md:text-4xl font-semibold">
+          <h2 className="text-3xl md:text-4xl font-medium">
             Hydrocolloid Roll
           </h2>
           <p className="text-gray-700 mt-3">

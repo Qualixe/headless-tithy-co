@@ -43,7 +43,7 @@ export function Header({header, cart, logoUrl}: HeaderProps) {
       className="h-8 w-auto object-contain"
     />
   ) : (
-    <span className="font-semibold text-lg">{shop.name}</span>
+    <span className="font-medium text-lg">{shop.name}</span>
   );
 
   return (

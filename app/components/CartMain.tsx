@@ -91,7 +91,7 @@ function CartEmpty() {
       <div className="w-14 h-14 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center mb-4">
         <ShoppingCart className="w-6 h-6" />
       </div>
-      <h3 className="font-semibold text-lg">Your cart is empty</h3>
+      <h3 className="font-medium text-lg">Your cart is empty</h3>
       <p className="text-sm text-gray-500 mt-1 max-w-xs">
         Looks like you haven&rsquo;t added anything to your cart yet.
       </p>

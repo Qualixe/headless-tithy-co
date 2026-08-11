@@ -20,7 +20,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       </h4>
       <div className="flex justify-between items-center mb-4">
         <span>Total</span>
-        <span className="font-semibold">
+        <span className="font-medium">
           {cart?.cost?.subtotalAmount?.amount &&
           cart.cost.subtotalAmount.currencyCode
             ? formatMoney({

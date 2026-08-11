@@ -63,7 +63,7 @@ export function ProductInfo({product}: {product: TithyProduct}) {
 
       {product.shortDescription && (
         <div className="pb-4">
-          <h2 className="text-lg font-semibold mb-2">কেন Hydrocolloid Roll?</h2>
+          <h2 className="text-lg font-medium mb-2">কেন Hydrocolloid Roll?</h2>
           <p className="text-sm text-gray-600 whitespace-pre-line">
             {product.shortDescription}
           </p>
