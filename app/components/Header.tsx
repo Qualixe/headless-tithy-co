@@ -49,7 +49,7 @@ export function Header({header, cart, logoUrl}: HeaderProps) {
   return (
     <>
       <header className="sticky top-0 z-40 bg-white/20 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-3 h-16 grid grid-cols-3 items-center">
+        <div className="max-w-6xl mx-auto px-3 h-14 md:h-16 grid grid-cols-3 items-center">
           <div className="flex items-center">
             <button
               onClick={() => open('mobile')}
