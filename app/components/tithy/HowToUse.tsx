@@ -32,8 +32,8 @@ const STEPS = [
 
 export function HowToUse() {
   return (
-    <section className="bg-gray-50 py-4 md:py-16">
-      <div className="max-w-6xl mx-auto px-4">
+    <section id="how-to-use" className="scroll-mt-16 bg-gray-50 py-4 md:py-16">
+      <div className="max-w-6xl mx-auto px-3">
         <div className="text-center">
           <h2 className="text-xl md:text-3xl font-semibold mb-1">{HEADING}</h2>
           <p className="text-gray-500 mb-8">{SUBHEADING}</p>
@@ -43,7 +43,7 @@ export function HowToUse() {
           {STEPS.map((s) => (
             <div key={s.title} className="flex sm:block gap-3">
               <div
-                className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 rounded-md bg-green-100 text-green-700 flex items-center justify-center mb-0 sm:mb-3"
+                className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 rounded-md bg-brand/10 text-brand flex items-center justify-center mb-0 sm:mb-3"
                 dangerouslySetInnerHTML={{__html: s.icon}}
               />
               <div>

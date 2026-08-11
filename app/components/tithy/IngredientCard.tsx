@@ -22,7 +22,7 @@ export function IngredientCard({
   return (
     <div className="border rounded-xl p-4 flex gap-3">
       <div
-        className="w-10 h-10 shrink-0 rounded-full bg-green-50 text-green-700 flex items-center justify-center"
+        className="w-10 h-10 shrink-0 rounded-full bg-brand/10 text-brand flex items-center justify-center"
         dangerouslySetInnerHTML={{__html: ICONS[icon] ?? DEFAULT_ICON}}
       />
       <div>

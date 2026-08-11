@@ -10,7 +10,6 @@ type Bundle = {
   image: string;
   discountPct: number;
   badge: string | null;
-  badgeColor: string;
 };
 
 export const BUNDLES: Bundle[] = [
@@ -20,7 +19,6 @@ export const BUNDLES: Bundle[] = [
     image: shopifyFileUrl('bundle-1.png'),
     discountPct: 0,
     badge: null,
-    badgeColor: 'bg-black',
   },
   {
     qty: 2,
@@ -28,7 +26,6 @@ export const BUNDLES: Bundle[] = [
     image: shopifyFileUrl('bundle-2.png'),
     discountPct: 10,
     badge: 'Most Valuable',
-    badgeColor: 'bg-black',
   },
   {
     qty: 3,
@@ -36,7 +33,6 @@ export const BUNDLES: Bundle[] = [
     image: shopifyFileUrl('bundle-3.png'),
     discountPct: 10,
     badge: 'Recommended',
-    badgeColor: 'bg-green-600',
   },
 ];
 
@@ -67,14 +63,14 @@ export function BundlePicker({
               onClick={() => onSelect(bundle.qty)}
               className={`relative rounded-md cursor-pointer md:rounded-xl border text-center flex flex-col items-center transition-shadow p-3 pt-4 ${
                 isSelected
-                  ? 'border-black shadow-md'
+                  ? 'border-brand shadow-md'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               {bundle.badge && (
                 <div className="absolute -top-2.5 inset-x-0 flex justify-center">
                   <span
-                    className={`${bundle.badgeColor} text-white text-[9px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full whitespace-nowrap`}
+                    className={`${bundle.badge === 'Recommended' ? 'bg-black' : 'bg-brand'} text-white text-[9px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full whitespace-nowrap`}
                   >
                     {bundle.badge}
                   </span>
@@ -110,7 +106,7 @@ export function BundlePicker({
               </div>
 
               {bundle.discountPct > 0 && (
-                <span className="mt-1.5 bg-green-600 text-white text-[9px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full whitespace-nowrap">
+                <span className="mt-1.5 bg-brand text-white text-[9px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full whitespace-nowrap">
                   Save{' '}
                   {formatMoney({
                     amount: saved.toFixed(2),

@@ -9,6 +9,7 @@
 
 @theme inline {
   --font-bangla: 'Hind Siliguri', sans-serif;
+  --color-brand: #0f4f45;
 }
 
 body {

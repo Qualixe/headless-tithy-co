@@ -1,5 +1,6 @@
+import {Fragment} from 'react';
 import {Image} from '@shopify/hydrogen';
-import {ChevronRight} from 'lucide-react';
+import {ArrowRight} from 'lucide-react';
 import {shopifyFileUrl} from '~/lib/shopifyFile';
 import {ShopNowButton} from './ShopNowButton';
 
@@ -24,8 +25,11 @@ const STEPS = [
 
 export function ProductStory() {
   return (
-    <section className="bg-gradient-to-br from-gray-50 to-white py-8 md:py-16">
-      <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+    <section
+      id="about"
+      className="scroll-mt-16 bg-linear-to-br from-gray-50 to-white py-8 md:py-16"
+    >
+      <div className="max-w-6xl mx-auto px-3 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-gray-50">
           <Image
             src={shopifyFileUrl('image-text.png')}
@@ -51,20 +55,25 @@ export function ProductStory() {
 
           <div className="flex items-start mt-8">
             {STEPS.map((step, i) => (
-              <div key={step.label} className="flex items-start">
-                <div className="flex flex-col items-center gap-2">
+              <Fragment key={step.label}>
+                <div className="flex flex-col items-center gap-2.5">
                   <div
-                    className="w-12 md:w-14 h-12 md:h-14 rounded-full bg-green-50 text-green-700 flex items-center justify-center"
+                    className="w-14 h-14 rounded-full bg-brand/10 text-brand ring-1 ring-brand/15 shadow-md flex items-center justify-center"
                     dangerouslySetInnerHTML={{__html: step.icon}}
                   />
-                  <span className="text-sm font-medium">{step.label}</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    {step.label}
+                  </span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mt-4 mx-2 sm:mx-3 shrink-0">
-                    <ChevronRight className="w-4 h-4" />
+                  <div className="relative flex-1">
+                    <div className="absolute top-7 left-0 right-0 h-px bg-brand -translate-y-1/2" />
+                    <div className="absolute top-7 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                      <ArrowRight className="w-4 h-4 text-brand" />
+                    </div>
                   </div>
                 )}
-              </div>
+              </Fragment>
             ))}
           </div>
 

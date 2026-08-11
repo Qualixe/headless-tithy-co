@@ -45,7 +45,7 @@ export function ProductInfo({product}: {product: TithyProduct}) {
 
   return (
     <div className="flex flex-col py-2 md:py-4">
-      <h1 className="text-3xl !m-0 md:text-4xl font-semibold pb-1">
+      <h1 className="text-3xl !m-0 md:text-4xl text-brand font-medium pb-1">
         {product.title}
       </h1>
       {product.subtitle && (

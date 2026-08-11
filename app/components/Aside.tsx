@@ -28,10 +28,12 @@ export function Aside({
   children,
   heading,
   type,
+  side = 'right',
 }: {
   children?: React.ReactNode;
   type: AsideType;
   heading: React.ReactNode;
+  side?: 'left' | 'right';
 }) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
@@ -62,6 +64,16 @@ export function Aside({
   return (
     <div
       aria-modal
+      // Hiding this purely via Tailwind classes (translate-x-full etc.) means
+      // it depends on the stylesheet having loaded — on a cold dev-server
+      // start that can take a second or two, during which the unstyled,
+      // unhidden content would flash on screen. An inline style has no such
+      // dependency: the browser applies it immediately on first paint. Only
+      // used pre-mount though — permanently forcing display:none would also
+      // break the slide transition on every future open (can't animate from
+      // display:none in the same update), so once mounted we fall back to
+      // the class-based hide, which animates smoothly.
+      style={!mounted && !expanded ? {display: 'none'} : undefined}
       className={`fixed inset-0 z-50 ${expanded ? 'pointer-events-auto' : 'pointer-events-none'}`}
       role="dialog"
       aria-labelledby={id}
@@ -71,8 +83,12 @@ export function Aside({
         onClick={close}
       />
       <div
-        className={`absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl flex flex-col ${mounted ? 'transition-transform' : ''} ${
-          expanded ? 'translate-x-0' : 'translate-x-full'
+        className={`absolute ${side === 'left' ? 'left-0' : 'right-0'} top-0 h-full w-full max-w-md bg-white shadow-xl flex flex-col ${mounted ? 'transition-transform' : ''} ${
+          expanded
+            ? 'translate-x-0'
+            : side === 'left'
+              ? '-translate-x-full'
+              : 'translate-x-full'
         }`}
       >
         <div className="flex justify-between items-center px-4 py-4 border-b shrink-0">

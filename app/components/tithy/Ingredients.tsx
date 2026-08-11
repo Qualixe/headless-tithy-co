@@ -8,11 +8,11 @@ export function Ingredients({items}: {items: TithyIngredient[]}) {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-3 md:py-16">
-      <div className="max-w-6xl mx-auto px-4">
+    <section id="ingredients" className="scroll-mt-16 py-3 md:py-16">
+      <div className="max-w-6xl mx-auto px-3">
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="text-xl md:text-3xl font-semibold mb-1">{HEADING}</h2>
-          <p className="text-gray-500 mt-1 mb-8">{SUBHEADING}</p>
+          <p className="text-gray-500 mt-1 md-4 md:mb-8">{SUBHEADING}</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
