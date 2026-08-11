@@ -11,7 +11,7 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/root';
-import favicon from '~/assets/favicon.svg';
+import favicon from '~/assets/favicon.ico';
 import {HEADER_QUERY} from '~/lib/fragments';
 import {
   SHOP_POLICIES_QUERY,
